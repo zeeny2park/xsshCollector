@@ -29,6 +29,7 @@
 #define OP_SUMMARY "summary"
 #define OP_PROCESS_LIST "process_list"
 #define OP_PROCESS_DETAILS "process_details"
+#define OP_EXEC "exec"
 
 /* Standard error codes matching Glances Protocol v1.0 */
 #define ERR_INVALID_REQUEST "INVALID_REQUEST"
@@ -37,5 +38,6 @@
 #define ERR_PERMISSION_DENIED "PERMISSION_DENIED"
 #define ERR_INTERNAL_ERROR "INTERNAL_ERROR"
 #define ERR_RESPONSE_TOO_LARGE "RESPONSE_TOO_LARGE"
+#define ERR_EXEC_FAILED "EXEC_FAILED"
 
 #endif /* GLANCES_COLLECTOR_PROTOCOL_H */

@@ -25,9 +25,11 @@ static void print_usage(const char *prog_name) {
             "  capabilities      Report collector capabilities and target architecture\n"
             "  summary           System summary (OS, uptime, CPU, memory, load)\n"
             "  process_list      List running processes with basic metrics\n"
-            "  process_details   Detailed metrics for a specific PID (requires --pid)\n\n"
+            "  process_details   Detailed metrics for a specific PID (requires --pid)\n"
+            "  exec              Execute command and return stdout/stderr/code (requires --cmd)\n\n"
             "Options:\n"
             "  -o, --op <name>       Operation to perform (required)\n"
+            "  -c, --cmd <command>   Command to execute (required for exec)\n"
             "  -p, --pid <pid>       Target PID (required for process_details)\n"
             "  -t, --target <id>     Target identity string (default: hostname)\n"
             "  -f, --format <fmt>    Output format (must be 'json', default: json)\n"
@@ -38,11 +40,13 @@ static void print_usage(const char *prog_name) {
 
 int main(int argc, char *argv[]) {
     char *op = NULL;
+    char *cmd = NULL;
     char *target_id = NULL;
     int pid = -1;
 
     static struct option long_options[] = {
         {"op",      required_argument, 0, 'o'},
+        {"cmd",     required_argument, 0, 'c'},
         {"pid",     required_argument, 0, 'p'},
         {"target",  required_argument, 0, 't'},
         {"format",  required_argument, 0, 'f'},
@@ -52,10 +56,13 @@ int main(int argc, char *argv[]) {
     };
 
     int opt;
-    while ((opt = getopt_long(argc, argv, "o:p:t:f:vh", long_options, NULL)) != -1) {
+    while ((opt = getopt_long(argc, argv, "o:c:p:t:f:vh", long_options, NULL)) != -1) {
         switch (opt) {
             case 'o':
                 op = optarg;
+                break;
+            case 'c':
+                cmd = optarg;
                 break;
             case 'p':
                 pid = atoi(optarg);
@@ -126,6 +133,15 @@ int main(int argc, char *argv[]) {
             ret = 1;
         } else {
             ret = collect_process_details(&jw, target_id, pid);
+        }
+    } else if (strcmp(op, OP_EXEC) == 0) {
+        if (!cmd) {
+            fprintf(stderr, "[collector] Error: --cmd <command> is required for exec\n");
+            jw_write_envelope_error(&jw, op, target_id, now,
+                                    ERR_INVALID_REQUEST, "Missing required --cmd argument for exec", NULL, 0);
+            ret = 1;
+        } else {
+            ret = collect_exec(&jw, target_id, cmd);
         }
     } else {
         fprintf(stderr, "[collector] Error: Unsupported operation '%s'\n", op);

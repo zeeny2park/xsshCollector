@@ -71,6 +71,7 @@ def test_collector_capabilities():
     assert "summary" in parsed["capabilities"]
     assert "process_list" in parsed["capabilities"]
     assert "process_details" in parsed["capabilities"]
+    assert "exec" in parsed["capabilities"]
 
     target_info = parsed["data"]["target_info"]
     assert target_info["os"] == "Linux"
@@ -223,3 +224,42 @@ def test_collector_static_binary():
     parsed = parse_and_validate(res.stdout)
     assert parsed["status"] == "ok"
     assert parsed["target_id"] == "static-target"
+
+
+def test_collector_exec_success():
+    """Test generic 'exec' operation collecting command stdout/exit_code."""
+    res = run_collector("--op", "exec", "--cmd", "echo 'Hello Collector'", "--target", "test-board-01")
+    assert res.returncode == 0
+    parsed = parse_and_validate(res.stdout)
+    assert parsed["status"] == "ok"
+    assert parsed["operation"] == "exec"
+    assert parsed["target_id"] == "test-board-01"
+
+    data = parsed["data"]
+    assert data["command"] == "echo 'Hello Collector'"
+    assert data["exit_code"] == 0
+    assert "Hello Collector" in data["stdout"]
+    assert data["stderr"] == ""
+    assert isinstance(data["duration_ms"], (int, float))
+    assert data["duration_ms"] >= 0
+
+
+def test_collector_exec_missing_cmd():
+    """Test structured error response when --cmd is omitted for exec."""
+    res = run_collector("--op", "exec")
+    assert res.returncode != 0
+    parsed = parse_and_validate(res.stdout)
+    assert parsed["status"] == "error"
+    assert parsed["operation"] == "exec"
+    assert parsed["error"]["code"] == "INVALID_REQUEST"
+
+
+def test_collector_exec_failure():
+    """Test 'exec' operation capturing non-zero exit code and stderr."""
+    res = run_collector("--op", "exec", "--cmd", "ls /nonexistent_path_collector_test")
+    assert res.returncode == 0  # Envelope emission succeeds even if command returns non-zero
+    parsed = parse_and_validate(res.stdout)
+    assert parsed["status"] == "ok"
+    data = parsed["data"]
+    assert data["exit_code"] != 0
+    assert "No such file or directory" in data["stderr"]

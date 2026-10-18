@@ -267,6 +267,7 @@ void jw_start_envelope_ok(json_writer_t *jw, const char *op, const char *target_
     jw_arr_string(jw, OP_SUMMARY);
     jw_arr_string(jw, OP_PROCESS_LIST);
     jw_arr_string(jw, OP_PROCESS_DETAILS);
+    jw_arr_string(jw, OP_EXEC);
     jw_end_array(jw);
 
     jw_key_start_object(jw, "data");
@@ -292,6 +293,7 @@ void jw_write_envelope_error(json_writer_t *jw, const char *op, const char *targ
     jw_arr_string(jw, OP_SUMMARY);
     jw_arr_string(jw, OP_PROCESS_LIST);
     jw_arr_string(jw, OP_PROCESS_DETAILS);
+    jw_arr_string(jw, OP_EXEC);
     jw_end_array(jw);
 
     jw_key_start_object(jw, "error");

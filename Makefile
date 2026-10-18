@@ -18,7 +18,8 @@ SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/sysinfo.c \
        $(SRC_DIR)/capabilities.c \
        $(SRC_DIR)/summary.c \
-       $(SRC_DIR)/process.c
+       $(SRC_DIR)/process.c \
+       $(SRC_DIR)/exec.c
 
 OBJS = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRCS))
 TARGET = $(BUILD_DIR)/glances-collector

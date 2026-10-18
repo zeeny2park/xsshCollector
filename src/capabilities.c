@@ -26,6 +26,7 @@ int collect_capabilities(json_writer_t *jw, const char *target_id) {
     jw_arr_string(jw, OP_SUMMARY);
     jw_arr_string(jw, OP_PROCESS_LIST);
     jw_arr_string(jw, OP_PROCESS_DETAILS);
+    jw_arr_string(jw, OP_EXEC);
     jw_end_array(jw);
 
     struct utsname uts;

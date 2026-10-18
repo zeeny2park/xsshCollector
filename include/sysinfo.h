@@ -30,5 +30,6 @@ int collect_capabilities(json_writer_t *jw, const char *target_id);
 int collect_summary(json_writer_t *jw, const char *target_id);
 int collect_process_list(json_writer_t *jw, const char *target_id);
 int collect_process_details(json_writer_t *jw, const char *target_id, int pid);
+int collect_exec(json_writer_t *jw, const char *target_id, const char *cmd);
 
 #endif /* GLANCES_COLLECTOR_SYSINFO_H */
